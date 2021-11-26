@@ -1,48 +1,55 @@
-import React, {useEffect} from 'react'
+import React, { useEffect } from "react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 
-import './layout.css'
+import "./layout.css";
 
-import Sidebar from '../sidebar/Sidebar'
-import TopNav from '../topnav/TopNav'
-import Routes from '../Routes'
+import Sidebar from "../sidebar/Sidebar";
+import TopNav from "../topnav/TopNav";
+import Routes from "../Routes";
+import Login from "../../pages/Login";
 
-import { BrowserRouter, Route } from 'react-router-dom'
-
-import { useSelector, useDispatch } from 'react-redux'
-
-import ThemeAction from '../../redux/actions/ThemeAction'
+import ThemeAction from "../../redux/actions/ThemeAction";
+import { actions as AuthActions } from "../../redux/AuthReducer";
 
 const Layout = () => {
+  const themeReducer = useSelector((state) => state.ThemeReducer);
+  const dispatch = useDispatch();
 
-    const themeReducer = useSelector(state => state.ThemeReducer)
+  const logout = () => {
+    dispatch(AuthActions.logOut());
+  };
 
-    const dispatch = useDispatch()
+  useEffect(() => {
+    const themeClass = localStorage.getItem("themeMode", "theme-mode-light");
+    const colorClass = localStorage.getItem("colorMode", "theme-mode-light");
 
-    useEffect(() => {
-        const themeClass = localStorage.getItem('themeMode', 'theme-mode-light')
+    dispatch(ThemeAction.setMode(themeClass));
+    dispatch(ThemeAction.setColor(colorClass));
+  }, [dispatch]);
 
-        const colorClass = localStorage.getItem('colorMode', 'theme-mode-light')
-
-        dispatch(ThemeAction.setMode(themeClass))
-
-        dispatch(ThemeAction.setColor(colorClass))
-    }, [dispatch])
-
-    return (
-        <BrowserRouter>
-            <Route render={(props) => (
-                <div className={`layout ${themeReducer.mode} ${themeReducer.color}`}>
-                    <Sidebar {...props}/>
-                    <div className="layout__content">
-                        <TopNav/>
-                        <div className="layout__content-main">
-                            <Routes/>
-                        </div>
-                    </div>
+  return (
+    <BrowserRouter>
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route
+          render={(props) => (
+            <div
+              className={`layout ${themeReducer.mode} ${themeReducer.color}`}
+            >
+              <Sidebar {...props} />
+              <div className="layout__content">
+                <TopNav logout={logout} />
+                <div className="layout__content-main">
+                  <Routes />
                 </div>
-            )}/>
-        </BrowserRouter>
-    )
-}
+              </div>
+            </div>
+          )}
+        />
+      </Switch>
+    </BrowserRouter>
+  );
+};
 
-export default Layout
+export default Layout;

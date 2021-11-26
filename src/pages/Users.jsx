@@ -5,7 +5,7 @@ import Modal from "react-modal";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../css/page.css";
-import { actions as CustomerActions } from "../redux/CustomersReducer";
+import { actions as UserActions } from "../redux/UsersReducer";
 
 import Table from "../components/table/Table";
 import Loading from "../components/loading/Loading";
@@ -19,22 +19,24 @@ import {
 const customerTableHead = [
   "id",
   "Tên",
-  "Số diện thoại",
+  "Ảnh đại diện",
   "Ngày tạo",
+  "Ngày cập nhập",
+  "Active",
   "Cập nhập",
 ];
 
-const Customers = () => {
+const Users = () => {
   const dispatch = useDispatch();
-  const customerReducer = useSelector((state) => state.CustomerReducer);
-  const { list, isFetching } = customerReducer;
+  const usersReducer = useSelector((state) => state.UserReducer);
+  const { list, isFetching } = usersReducer;
   const [visibleModal, setVisibleModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState();
   const [infoEdit, setInfoEdit] = useState({});
 
   useEffect(() => {
-    dispatch(CustomerActions.getCustomers());
+    dispatch(UserActions.getUsers());
   }, []);
   useEffect(() => {
     if (!selectedFile) {
@@ -63,7 +65,7 @@ const Customers = () => {
   };
   const deleteItem = (id) => {
     dispatch(
-      CustomerActions.deleteCustomer(id, {
+      UserActions.deleteUser(id, {
         onSuccess: (text) => {
           successNotificationToast(text);
         },
@@ -84,7 +86,7 @@ const Customers = () => {
 
   const addNewInfo = () => {
     // dispatch(
-    //   CustomerActions.createBanner(
+    //   UserActions.createBanner(
     //     {
     //       name: infoEdit.name ? infoEdit.name : "",
     //       image_url: "",
@@ -107,7 +109,7 @@ const Customers = () => {
   };
   const updateInfo = () => {
     // dispatch(
-    //   CustomerActions.updateBanner(
+    //   UserActions.updateBanner(
     //     infoEdit.id,
     //     {
     //       description: infoEdit.description,
@@ -154,8 +156,16 @@ const Customers = () => {
       <tr key={index}>
         <td>{item.id}</td>
         <td>{item.full_name}</td>
-        <td>{item.phone}</td>
+        <td>
+          <img
+            style={{ height: "50px" }}
+            src={item.avatar_url}
+            placeholder={item.name}
+          />
+        </td>
         <td>{numToDate(item.created_date)}</td>
+        <td>{numToDate(item.modified_date)}</td>
+        <td>{item.is_active ? "Active" : "NotActive"}</td>
         <td>
           <div style={{ display: "flex", displayDirection: "row" }}>
             <a style={{ width: "40px" }} onClick={() => editItem(item)}>
@@ -180,7 +190,7 @@ const Customers = () => {
   return (
     <div>
       <div className="header-title">
-        <h2 className="page-header">Quản lý khách hàng</h2>
+        <h2 className="page-header">Quản lý người dùng</h2>
         <a className="btn-header-title" onClick={createItem}>
           <i className="bx bx-add-to-queue" style={{ color: "white" }}></i>
         </a>
@@ -300,4 +310,4 @@ const Customers = () => {
   );
 };
 
-export default Customers;
+export default Users;

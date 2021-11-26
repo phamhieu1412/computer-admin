@@ -5,7 +5,7 @@ import Modal from "react-modal";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../css/page.css";
-import { actions as CustomerActions } from "../redux/CustomersReducer";
+import { actions as CategoryActions } from "../redux/CategoriesReducer";
 
 import Table from "../components/table/Table";
 import Loading from "../components/loading/Loading";
@@ -19,22 +19,23 @@ import {
 const customerTableHead = [
   "id",
   "Tên",
-  "Số diện thoại",
-  "Ngày tạo",
+  "Ảnh",
+  "Mô tả",
+  "Đường dẫn SEO",
   "Cập nhập",
 ];
 
-const Customers = () => {
+const Categories = () => {
   const dispatch = useDispatch();
-  const customerReducer = useSelector((state) => state.CustomerReducer);
-  const { list, isFetching } = customerReducer;
+  const categoryReducer = useSelector((state) => state.CategoryReducer);
+  const { list, isFetching } = categoryReducer;
   const [visibleModal, setVisibleModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState();
   const [infoEdit, setInfoEdit] = useState({});
 
   useEffect(() => {
-    dispatch(CustomerActions.getCustomers());
+    dispatch(CategoryActions.getCategories());
   }, []);
   useEffect(() => {
     if (!selectedFile) {
@@ -63,7 +64,7 @@ const Customers = () => {
   };
   const deleteItem = (id) => {
     dispatch(
-      CustomerActions.deleteCustomer(id, {
+      CategoryActions.deleteCategory(id, {
         onSuccess: (text) => {
           successNotificationToast(text);
         },
@@ -83,51 +84,51 @@ const Customers = () => {
   };
 
   const addNewInfo = () => {
-    // dispatch(
-    //   CustomerActions.createBanner(
-    //     {
-    //       name: infoEdit.name ? infoEdit.name : "",
-    //       image_url: "",
-    //       description: infoEdit.description ? infoEdit.description : "",
-    //       is_active: infoEdit.is_active,
-    //       url: "#",
-    //     },
-    //     selectedFile,
-    //     {
-    //       onSuccess: (text) => {
-    //         closeModal();
-    //         successNotificationToast(text);
-    //       },
-    //       onFailure: (textError) => {
-    //         notificationToast(textError);
-    //       },
-    //     }
-    //   )
-    // );
+    if (infoEdit.name === "" || !selectedFile) {
+      notificationToast("Hãy nhập đủ thông tin!");
+      return;
+    }
+    dispatch(
+      CategoryActions.createCategory(
+        {
+          name: infoEdit.name,
+          image_url: "",
+          description: infoEdit.description ? infoEdit.description : "",
+        },
+        selectedFile,
+        {
+          onSuccess: (text) => {
+            closeModal();
+            successNotificationToast(text);
+          },
+          onFailure: (textError) => {
+            notificationToast(textError);
+          },
+        }
+      )
+    );
   };
   const updateInfo = () => {
-    // dispatch(
-    //   CustomerActions.updateBanner(
-    //     infoEdit.id,
-    //     {
-    //       description: infoEdit.description,
-    //       is_active: infoEdit.is_active,
-    //       name: infoEdit.name,
-    //       image_url: infoEdit.image_url,
-    //       url: "#",
-    //     },
-    //     selectedFile,
-    //     {
-    //       onSuccess: (text) => {
-    //         closeModal();
-    //         successNotificationToast(text);
-    //       },
-    //       onFailure: (textError) => {
-    //         notificationToast(textError);
-    //       },
-    //     }
-    //   )
-    // );
+    dispatch(
+      CategoryActions.updateCategory(
+        infoEdit.id,
+        {
+          name: infoEdit.name,
+          image_url: infoEdit.image_url,
+          description: infoEdit.description,
+        },
+        selectedFile,
+        {
+          onSuccess: (text) => {
+            closeModal();
+            successNotificationToast(text);
+          },
+          onFailure: (textError) => {
+            notificationToast(textError);
+          },
+        }
+      )
+    );
   };
 
   const onChangeImage = (e) => {
@@ -145,30 +146,30 @@ const Customers = () => {
     setInfoEdit({ ...infoEdit, description: e.target.value });
   };
 
-  const handleOptionChange = (e) => {
-    setInfoEdit({ ...infoEdit, is_active: e.target.value });
-  };
-
   const renderBody = (item, index) => {
     return (
       <tr key={index}>
         <td>{item.id}</td>
-        <td>{item.full_name}</td>
-        <td>{item.phone}</td>
-        <td>{numToDate(item.created_date)}</td>
+        <td>{item.name}</td>
+        <td>
+          <img
+            style={{ height: "50px" }}
+            src={item.image_url}
+            placeholder={item.name}
+          />
+        </td>
+        <td>{item.description}</td>
+        <td>{item.link_seo}</td>
         <td>
           <div style={{ display: "flex", displayDirection: "row" }}>
-            <a style={{ width: "40px" }} onClick={() => editItem(item)}>
-              <div style={{ padding: "0px" }} className="notification-item">
-                <i
-                  style={{ marginRight: "0px" }}
-                  className="bx bx-edit-alt"
-                ></i>
+            <a onClick={() => editItem(item)}>
+              <div className="notification-item">
+                <i className="bx bx-edit-alt"></i>
               </div>
             </a>
-            <a style={{ width: "40px" }} onClick={() => deleteItem(item.id)}>
-              <div style={{ padding: "0px" }} className="notification-item">
-                <i style={{ marginRight: "0px" }} className="bx bx-trash"></i>
+            <a onClick={() => deleteItem(item.id)}>
+              <div className="notification-item">
+                <i className="bx bx-trash"></i>
               </div>
             </a>
           </div>
@@ -180,7 +181,7 @@ const Customers = () => {
   return (
     <div>
       <div className="header-title">
-        <h2 className="page-header">Quản lý khách hàng</h2>
+        <h2 className="page-header">Danh mục sản phẩm</h2>
         <a className="btn-header-title" onClick={createItem}>
           <i className="bx bx-add-to-queue" style={{ color: "white" }}></i>
         </a>
@@ -250,33 +251,6 @@ const Customers = () => {
               value={infoEdit.description && infoEdit.description}
             />
           </div>
-          <div className="id-item-edit">
-            <h4>Active</h4>
-            <div>
-              <input
-                type="radio"
-                value="true"
-                name="active"
-                onChange={handleOptionChange}
-                checked={
-                  (infoEdit.is_active == true ||
-                    infoEdit.is_active == "true") &&
-                  "true"
-                }
-              />
-              <input
-                type="radio"
-                value="false"
-                name="active"
-                onChange={handleOptionChange}
-                checked={
-                  (infoEdit.is_active == false ||
-                    infoEdit.is_active == "false") &&
-                  "false"
-                }
-              />
-            </div>
-          </div>
           <div className="action-modal">
             <button
               className="update"
@@ -300,4 +274,4 @@ const Customers = () => {
   );
 };
 
-export default Customers;
+export default Categories;
