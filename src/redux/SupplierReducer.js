@@ -41,7 +41,7 @@ export const actions = {
     const api = API_URLS.SUPPLIER.createSupplier(payload);
     const { response } = await apiCall(api);
 
-    if (response.status === 200 && response.data && response.data.data) {
+    if (response?.status === 200 && response.data && response.data.data) {
       dispatch(actions.createSuccess());
       meta.onSuccess("Tạo thành công");
       dispatch(actions.getSuppliers());
@@ -106,7 +106,7 @@ export const actions = {
 
     const api = API_URLS.SUPPLIER.updateSupplier(id, payload);
     const { response } = await apiCall(api);
-    if (response.status === 200 && response.data && response.data.data) {
+    if (response?.status === 200 && response.data && response.data.data) {
       const data = response.data.data;
       dispatch(actions.updateSuccess(data));
       meta.onSuccess("Chỉnh sửa thành công");
@@ -134,7 +134,7 @@ export const actions = {
     const api = API_URLS.SUPPLIER.deleteSupplier(id);
     const { response } = await apiCall(api);
 
-    if (response.status === 200 && response.data && response.data.code == 200) {
+    if (response?.status === 200 && response.data && response.data.code == 200) {
       dispatch(actions.deleteSuccess());
       meta.onSuccess("Xoá thành công");
       dispatch(actions.getSuppliers());

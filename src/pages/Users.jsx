@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import Modal from "react-modal";
+import { Button, Input, Popover } from "antd";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../css/page.css";
@@ -14,12 +15,12 @@ import {
   customStyles,
   notificationToast,
   successNotificationToast,
+  validateEmail,
 } from "../utils/numberFormatter";
 
 const customerTableHead = [
   "id",
   "Tên",
-  "Ảnh đại diện",
   "Ngày tạo",
   "Ngày cập nhập",
   "Active",
@@ -31,25 +32,12 @@ const Users = () => {
   const usersReducer = useSelector((state) => state.UserReducer);
   const { list, isFetching } = usersReducer;
   const [visibleModal, setVisibleModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState();
-  const [preview, setPreview] = useState();
   const [infoEdit, setInfoEdit] = useState({});
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     dispatch(UserActions.getUsers());
   }, []);
-  useEffect(() => {
-    if (!selectedFile) {
-      setPreview(undefined);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl);
-
-    // free memory when ever this component is unmounted
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile]);
 
   const renderHead = (item, index) => {
     return <th key={index}>{item}</th>;
@@ -75,80 +63,107 @@ const Users = () => {
       })
     );
   };
+  const changePassword = (id) => {
+    dispatch(
+      UserActions.forgotPassword(
+        {
+          email: email,
+        },
+        {
+          onSuccess: (text) => {
+            successNotificationToast(text);
+          },
+          onFailure: (textError) => {
+            notificationToast(textError);
+          },
+        }
+      )
+    );
+  };
 
   const openModal = () => {
     setVisibleModal(true);
   };
   const closeModal = () => {
-    setSelectedFile(undefined);
     setVisibleModal(false);
   };
 
   const addNewInfo = () => {
-    // dispatch(
-    //   UserActions.createBanner(
-    //     {
-    //       name: infoEdit.name ? infoEdit.name : "",
-    //       image_url: "",
-    //       description: infoEdit.description ? infoEdit.description : "",
-    //       is_active: infoEdit.is_active,
-    //       url: "#",
-    //     },
-    //     selectedFile,
-    //     {
-    //       onSuccess: (text) => {
-    //         closeModal();
-    //         successNotificationToast(text);
-    //       },
-    //       onFailure: (textError) => {
-    //         notificationToast(textError);
-    //       },
-    //     }
-    //   )
-    // );
-  };
-  const updateInfo = () => {
-    // dispatch(
-    //   UserActions.updateBanner(
-    //     infoEdit.id,
-    //     {
-    //       description: infoEdit.description,
-    //       is_active: infoEdit.is_active,
-    //       name: infoEdit.name,
-    //       image_url: infoEdit.image_url,
-    //       url: "#",
-    //     },
-    //     selectedFile,
-    //     {
-    //       onSuccess: (text) => {
-    //         closeModal();
-    //         successNotificationToast(text);
-    //       },
-    //       onFailure: (textError) => {
-    //         notificationToast(textError);
-    //       },
-    //     }
-    //   )
-    // );
-  };
-
-  const onChangeImage = (e) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      setSelectedFile(undefined);
+    const statusEmail = validateEmail(infoEdit.email);
+    if (!statusEmail) {
+      notificationToast("Email không hợp lệ!");
       return;
     }
+    dispatch(
+      UserActions.createUser(
+        {
+          full_name: infoEdit.full_name ? infoEdit.full_name : "",
+          email: infoEdit.email ? infoEdit.email : "",
+          is_active: infoEdit.is_active === "true" ? true : false,
+          permission_group_id: 1,
+        },
+        {
+          onSuccess: (text) => {
+            closeModal();
+            successNotificationToast(text);
+          },
+          onFailure: (textError) => {
+            notificationToast(textError);
+          },
+        }
+      )
+    );
+  };
+  const updateInfo = () => {
+    const statusEmail = validateEmail(infoEdit.email);
+    if (!statusEmail) {
+      notificationToast("Email không hợp lệ!");
+      return;
+    }
+    dispatch(
+      UserActions.editUser(
+        infoEdit.id,
+        {
+          full_name: infoEdit.full_name ? infoEdit.full_name : "",
+          email: infoEdit.email ? infoEdit.email : "",
+          is_active: infoEdit.is_active === "true" ? true : false,
+          permission_group_id: 1,
+        },
+        {
+          onSuccess: (text) => {
+            closeModal();
+            successNotificationToast(text);
+          },
+          onFailure: (textError) => {
+            notificationToast(textError);
+          },
+        }
+      )
+    );
+  };
 
-    setSelectedFile(e.target.files[0]);
-  };
   const onChangeName = (e) => {
-    setInfoEdit({ ...infoEdit, name: e.target.value });
+    setInfoEdit({ ...infoEdit, full_name: e.target.value });
   };
-  const onChangeDescription = (e) => {
-    setInfoEdit({ ...infoEdit, description: e.target.value });
+  const onChangeEmail = (e) => {
+    setInfoEdit({ ...infoEdit, email: e.target.value });
   };
 
   const handleOptionChange = (e) => {
     setInfoEdit({ ...infoEdit, is_active: e.target.value });
+  };
+
+  const renderChooseMethodDelivery = (id) => {
+    return (
+      <div className="block-form">
+        <span style={{ width: "50px" }}>Email lấy lại mật khẩu</span>
+        <Input
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ flexGrow: 1 }}
+        />
+        <Button onClick={() => changePassword(id)}>Đồng ý</Button>
+      </div>
+    );
   };
 
   const renderBody = (item, index) => {
@@ -156,13 +171,6 @@ const Users = () => {
       <tr key={index}>
         <td>{item.id}</td>
         <td>{item.full_name}</td>
-        <td>
-          <img
-            style={{ height: "50px" }}
-            src={item.avatar_url}
-            placeholder={item.name}
-          />
-        </td>
         <td>{numToDate(item.created_date)}</td>
         <td>{numToDate(item.modified_date)}</td>
         <td>{item.is_active ? "Active" : "NotActive"}</td>
@@ -176,6 +184,19 @@ const Users = () => {
                 ></i>
               </div>
             </a>
+            <Popover
+              style={{ margin: "0px" }}
+              content={() => renderChooseMethodDelivery(item.id)}
+              trigger="click"
+              placement="left"
+            >
+              <a style={{ width: "40px" }}>
+                <div style={{ padding: "0px" }} className="notification-item">
+                  <i style={{ marginRight: "0px" }} className="bx bx-key"></i>
+                </div>
+              </a>
+            </Popover>
+
             <a style={{ width: "40px" }} onClick={() => deleteItem(item.id)}>
               <div style={{ padding: "0px" }} className="notification-item">
                 <i style={{ marginRight: "0px" }} className="bx bx-trash"></i>
@@ -219,10 +240,11 @@ const Users = () => {
         isOpen={visibleModal}
         onRequestClose={closeModal}
         style={customStyles}
-        contentLabel="Example Modal"
       >
         <div className="modal-banner">
-          <h2 className="header-item-edit">Cập nhập thông tin</h2>
+          <h2 className="header-item-edit">
+            {infoEdit.id ? "Cập nhập thông tin" : "Thêm mới nhân viên"}
+          </h2>
           {infoEdit.id && (
             <div className="id-item-edit">
               <h4>id</h4>
@@ -235,29 +257,16 @@ const Users = () => {
               placeholder="Nhập tên"
               type="text"
               onChange={onChangeName}
-              value={infoEdit.name && infoEdit.name}
+              value={infoEdit.full_name && infoEdit.full_name}
             />
           </div>
           <div className="id-item-edit">
-            <h4>Ảnh</h4>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              {selectedFile ? (
-                <img src={preview} style={{ width: "100px" }} />
-              ) : (
-                infoEdit.image_url && (
-                  <img src={infoEdit.image_url} style={{ width: "100px" }} />
-                )
-              )}
-              <input type="file" accept="image/*" onChange={onChangeImage} />
-            </div>
-          </div>
-          <div className="id-item-edit">
-            <h4>Mô tả</h4>
+            <h4>Email</h4>
             <input
-              placeholder="Nhập mô tả"
+              placeholder="Nhập email"
               type="text"
-              onChange={onChangeDescription}
-              value={infoEdit.description && infoEdit.description}
+              onChange={onChangeEmail}
+              value={infoEdit.email && infoEdit.email}
             />
           </div>
           <div className="id-item-edit">

@@ -58,7 +58,7 @@ export const actions = {
         const api = API_URLS.BANNER.createBanner(tempData);
         const { response } = await apiCall(api);
 
-        if (response.status === 200 && response.data && response.data.data) {
+        if (response?.status === 200 && response.data && response.data.data) {
           dispatch(actions.createSuccess());
           meta.onSuccess("Tạo thành công");
           dispatch(actions.getBanners());
@@ -74,7 +74,7 @@ export const actions = {
       const api = API_URLS.BANNER.createBanner(payload);
       const { response } = await apiCall(api);
 
-      if (response.status === 200 && response.data && response.data.data) {
+      if (response?.status === 200 && response.data && response.data.data) {
         dispatch(actions.createSuccess());
         meta.onSuccess("Tạo thành công");
         dispatch(actions.getBanners());
@@ -194,7 +194,7 @@ export const actions = {
         };
         const api = API_URLS.BANNER.updateBanner(id, tempData);
         const { response } = await apiCall(api);
-        if (response.status === 200 && response.data && response.data.data) {
+        if (response?.status === 200 && response.data && response.data.data) {
           const data = response.data.data;
           dispatch(actions.updateSuccess(data));
           meta.onSuccess("Chỉnh sửa thành công");
@@ -214,7 +214,7 @@ export const actions = {
       };
       const api = API_URLS.BANNER.updateBanner(id, tempData);
       const { response } = await apiCall(api);
-      if (response.status === 200 && response.data && response.data.data) {
+      if (response?.status === 200 && response.data && response.data.data) {
         const data = response.data.data;
         dispatch(actions.updateSuccess(data));
         meta.onSuccess("Chỉnh sửa thành công");
@@ -243,7 +243,7 @@ export const actions = {
     const api = API_URLS.BANNER.deleteBanner(id);
     const { response } = await apiCall(api);
 
-    if (response.status === 200 && response.data && response.data.code == 200) {
+    if (response?.status === 200 && response.data && response.data.code == 200) {
       dispatch(actions.deleteSuccess());
       meta.onSuccess("Xoá thành công");
       dispatch(actions.getBanners());

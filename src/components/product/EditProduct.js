@@ -17,29 +17,28 @@ import "antd/dist/antd.css";
 import "../../css/page.css";
 import UploadImage from "./UploadImage";
 
-const EditProduct = ({ onCancelModalCreate, updateInfo, infoEdit }) => {
+const EditProduct = ({ onCancelModalCreate, updateInfo, detail }) => {
   const manufacturerReducer = useSelector((state) => state.ManufacturerReducer);
   const categoryReducer = useSelector((state) => state.CategoryReducer);
+  const [id, setId] = useState(detail.id ? detail.id : 1);
   const [data, setData] = useState({
-    name: infoEdit.name ? infoEdit.name : "",
-    code: infoEdit.code ? infoEdit.code : "",
-    price: infoEdit.price ? infoEdit.price : 0,
-    description: infoEdit.description ? infoEdit.description : "",
-    specification: infoEdit.specification ? infoEdit.specification : "",
-    user_manual: infoEdit.user_manual ? infoEdit.user_manual : "",
-    warranty: infoEdit.warranty ? infoEdit.warranty : "",
-    avatar_url: infoEdit.avatar_url ? infoEdit.avatar_url : "",
-    other_images_url: infoEdit.other_images_url
-      ? infoEdit.other_images_url
-      : "",
-    inventory_number: infoEdit.inventory_number ? infoEdit.inventory_number : 0,
-    discount_percent: infoEdit.discount_percent ? infoEdit.discount_percent : 0,
-    discount_value: infoEdit.discount_value ? infoEdit.discount_value : 0,
-    is_active: infoEdit.is_active ? infoEdit.is_active : 0,
-    is_top: infoEdit.is_top ? infoEdit.is_top : 0,
-    product_unit: infoEdit.product_unit ? infoEdit.product_unit : 0,
-    category_id: infoEdit.category_id ? infoEdit.category_id : 0,
-    manufacturer_id: infoEdit.manufacturer_id ? infoEdit.manufacturer_id : 0,
+    name: detail.name ? detail.name : "",
+    code: detail.code ? detail.code : "",
+    price: detail.price ? detail.price : 0,
+    description: detail.description ? detail.description : "",
+    specification: detail.specification ? detail.specification : "",
+    user_manual: detail.user_manual ? detail.user_manual : "",
+    warranty: detail.warranty ? detail.warranty : "",
+    avatar_url: detail.avatar_url ? detail.avatar_url : "",
+    other_images_url: detail.other_images_url ? detail.other_images_url : "",
+    inventory_number: detail.inventory_number ? detail.inventory_number : 0,
+    discount_percent: detail.discount_percent ? detail.discount_percent : 0,
+    discount_value: detail.discount_value ? detail.discount_value : 0,
+    is_active: detail.is_active ? detail.is_active : 0,
+    is_top: detail.is_top ? detail.is_top : 0,
+    product_unit: detail.product_unit ? detail.product_unit : 0,
+    category_id: detail.category_id ? detail.category_id : 0,
+    manufacturer_id: detail.manufacturer_id ? detail.manufacturer_id : 0,
   });
   const [dataImg, setDataImg] = useState([]);
 
@@ -87,7 +86,7 @@ const EditProduct = ({ onCancelModalCreate, updateInfo, infoEdit }) => {
   };
 
   const onOk = () => {
-    updateInfo(data, dataImg);
+    updateInfo(data, dataImg, id);
   };
 
   return (

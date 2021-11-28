@@ -8,67 +8,77 @@ import {
   isFailedApiCall,
 } from "./actionDedicate";
 import { PREFIX, typesWithPrefix } from "./config";
+import { actions as AuthActions } from "../redux/AuthReducer";
 
-const { API_CALLING, API_CALLED_SUCCESS, API_CALLED_FAILURE, AUTH } = PREFIX;
+const { API_CALLING, API_CALLED_SUCCESS, API_CALLED_FAILURE, ORDERS } = PREFIX;
 
-const _types = typesWithPrefix(AUTH);
+const _types = typesWithPrefix(ORDERS);
 const TYPE = {
-  LOGIN: _types("LOGIN"),
-  LOGOUT: _types("LOGOUT"),
+  GET_ALL: _types("GET_ALL"),
+  GET_DETAIL: _types("GET_DETAIL"),
+  UPDATE_STATUS: _types("UPDATE_STATUS"),
+  UPDATE_STATUS_AND_TIME: _types("UPDATE_STATUS_AND_TIME"),
+  UPDATE_DATE: _types("UPDATE_DATE"),
+  CANCEL_ORDER: _types("CANCEL_ORDER"),
 };
 
 export const actions = {
-  // login
-  logging: () => ({
-    type: TYPE.LOGIN,
-    meta: { prefix: [AUTH, API_CALLING] },
+  gettingAll: () => ({
+    type: TYPE.GET_ALL,
+    meta: { prefix: [ORDERS, API_CALLING] },
   }),
-  loginSuccess: (payload) => ({
-    type: TYPE.LOGIN,
-    meta: { prefix: [AUTH, API_CALLED_SUCCESS] },
+  getAllSuccess: (payload) => ({
+    type: TYPE.GET_ALL,
+    meta: { prefix: [ORDERS, API_CALLED_SUCCESS] },
     payload,
   }),
-  loginFailure: () => ({
-    type: TYPE.LOGIN,
-    meta: { prefix: [AUTH, API_CALLED_FAILURE] },
+  getAllFailure: () => ({
+    type: TYPE.GET_ALL,
+    meta: { prefix: [ORDERS, API_CALLED_FAILURE] },
   }),
-  login: (payload, meta) => async (dispatch) => {
-    dispatch(actions.logging());
-    const api = API_URLS.USER.login(payload);
-    const { response } = await apiCall(api);
+  getOrders: (params) => async (dispatch) => {
+    dispatch(actions.gettingAll());
+    const api = API_URLS.ORDERS.getOrders(params);
+    const { response, status } = await apiCall(api);
 
-    if (response.status === 200 && response.data && response.data.data) {
-      const data = response.data.data;
-      dispatch(actions.loginSuccess(data));
-      meta.onSuccess();
+    console.log("xxx status", status, response);
+    if (
+      response?.status === 200 &&
+      response.data &&
+      response.data.code === 200
+    ) {
+      const status = response.data.message.status;
+      if (status === "success") {
+        const data = response.data.data;
+        dispatch(
+          actions.getAllSuccess({ data, page: params.page, filter: params })
+        );
+      } else {
+        dispatch(actions.getAllFailure());
+      }
+    } else if (status && status === 401) {
+      dispatch(AuthActions.logOut());
     } else {
-      dispatch(actions.loginFailure());
-      meta.onFailure('Email hoặc mật khẩu không đúng! Vui lòng thử lại.');
+      dispatch(actions.getAllFailure());
     }
   },
 
-  // dang xuat
-  logOut: () => (dispatch) => {
-    dispatch({ type: TYPE.LOGOUT });
-  },
-
-  // get info user
-  gettingInfoUser: () => ({
-    type: TYPE.GET_INFO_USER,
-    meta: { prefix: [AUTH, API_CALLING] },
+  gettingDetail: () => ({
+    type: TYPE.GET_DETAIL,
+    meta: { prefix: [ORDERS, API_CALLING] },
   }),
-  getInfoUserSuccess: (payload) => ({
-    type: TYPE.GET_INFO_USER,
-    meta: { prefix: [AUTH, API_CALLED_SUCCESS] },
+  getDetailSuccess: (payload) => ({
+    type: TYPE.GET_DETAIL,
+    meta: { prefix: [ORDERS, API_CALLED_SUCCESS] },
     payload,
   }),
-  getInfoUserFailure: () => ({
-    type: TYPE.GET_INFO_USER,
-    meta: { prefix: [AUTH, API_CALLED_FAILURE] },
+  getDetailFailure: () => ({
+    type: TYPE.GET_DETAIL,
+    meta: { prefix: [ORDERS, API_CALLED_FAILURE] },
   }),
-  getUserInfo: () => async (dispatch) => {
-    dispatch(actions.gettingInfoUser());
-    const api = API_URLS.USER.getUserInfo();
+  getDetailOrder: (id) => async (dispatch) => {
+    dispatch(actions.gettingDetail());
+    const api = API_URLS.ORDERS.getDetailOrder(id);
     const { response, status } = await apiCall(api);
 
     if (
@@ -79,50 +89,128 @@ export const actions = {
       const status = response.data.message.status;
       if (status === "success") {
         const data = response.data.data;
-        dispatch(actions.getInfoUserSuccess(data));
+        dispatch(actions.getDetailSuccess(data));
       } else {
-        dispatch(actions.getInfoUserFailure());
+        dispatch(actions.getDetailFailure());
       }
-    } else if (status && status === 401) {
-      dispatch(actions.logOut());
     } else {
-      dispatch(actions.getInfoUserFailure());
+      dispatch(actions.getDetailFailure());
+    }
+  },
+
+  updateStatus: (id, payload, meta) => async (dispatch) => {
+    const api = API_URLS.ORDERS.updateStatus(id, payload);
+    const { response } = await apiCall(api);
+
+    if (
+      response?.status === 200 &&
+      response.data &&
+      response.data.data &&
+      response.data.message.status === "success"
+    ) {
+      meta.onSuccess("Cập nhập thành công");
+      dispatch(
+        actions.getOrders({
+          page: 1,
+          page_size: 10,
+        })
+      );
+    } else {
+      meta.onFailure("Cập nhập không thành công! Vui lòng thử lại.");
+    }
+  },
+
+  cancelOrder: (id, payload, meta) => async (dispatch) => {
+    const api = API_URLS.ORDERS.cancelOrder(id, payload);
+    const { response } = await apiCall(api);
+
+    if (
+      response?.status === 200 &&
+      response.data &&
+      response.data.code == 200 &&
+      response.data.message.status === "success"
+    ) {
+      meta.onSuccess("Xoá thành công");
+      dispatch(
+        actions.getOrders({
+          page: 1,
+          page_size: 10,
+        })
+      );
+    } else {
+      meta.onFailure("Xoá không thành công! Vui lòng thử lại.");
     }
   },
 };
 
 const initialState = {
   isFetching: false,
-  userDetail: {},
+  list: [],
+  detail: {},
+  isFetchingDetail: false,
+  meta: {
+    page: 1,
+    elementOfPage: 10,
+    total: 0,
+  },
+  filter: {},
 };
 
 export const reducer = produce((draft, action) => {
   switch (action.type) {
-    case TYPE.LOGIN:
+    case TYPE.CREATE:
       if (isCallingApi(action)) {
         draft.isFetching = true;
       }
       if (isSuccessfulApiCall(action)) {
         draft.isFetching = false;
-        draft.userDetail = action.payload;
-        localStorage.setItem("userInfo", JSON.stringify(action.payload));
-        localStorage.setItem("token", `Bearer ${action.payload.access_token}`);
-        localStorage.setItem(
-          "refresh_token",
-          `Bearer ${action.payload.refresh_token}`
-        );
       }
       if (isFailedApiCall(action)) {
         draft.isFetching = false;
-        draft.userDetail = {};
       }
       break;
 
-    case TYPE.LOGOUT:
-      localStorage.removeItem("userInfo");
-      localStorage.removeItem("token");
-      localStorage.removeItem("refresh_token");
-      draft.userDetail = {};
+    case TYPE.GET_ALL:
+      if (isCallingApi(action)) {
+        draft.isFetching = true;
+      }
+      if (isSuccessfulApiCall(action)) {
+        draft.isFetching = false;
+        draft.list = action.payload.data.items;
+        draft.meta.total = action.payload.data.total;
+        draft.meta.page = action.payload.data.page;
+        draft.meta.filter = action.payload.filter;
+      }
+      if (isFailedApiCall(action)) {
+        draft.isFetching = false;
+        draft.list = [];
+      }
+      break;
+
+    case TYPE.DELETE:
+      if (isCallingApi(action)) {
+        draft.isFetching = true;
+      }
+      if (isSuccessfulApiCall(action)) {
+        draft.isFetching = false;
+      }
+      if (isFailedApiCall(action)) {
+        draft.isFetching = false;
+      }
+      break;
+
+    case TYPE.GET_DETAIL:
+      if (isCallingApi(action)) {
+        draft.isFetchingDetail = true;
+      }
+      if (isSuccessfulApiCall(action)) {
+        draft.isFetchingDetail = false;
+        draft.detail = action.payload;
+      }
+      if (isFailedApiCall(action)) {
+        draft.isFetchingDetail = false;
+        draft.detail = {};
+      }
       break;
 
     default:

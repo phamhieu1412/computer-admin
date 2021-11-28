@@ -23,6 +23,68 @@ const TYPE = {
 };
 
 export const actions = {
+  creating: () => ({
+    type: TYPE.CREATE,
+    meta: { prefix: [STAFF, API_CALLING] },
+  }),
+  createSuccess: () => ({
+    type: TYPE.CREATE,
+    meta: { prefix: [STAFF, API_CALLED_SUCCESS] },
+  }),
+  createFailure: () => ({
+    type: TYPE.CREATE,
+    meta: { prefix: [STAFF, API_CALLED_FAILURE] },
+  }),
+  createUser: (payload, meta) => async (dispatch) => {
+    dispatch(actions.creating());
+
+    const api = API_URLS.USER.createUser(payload);
+    const { response } = await apiCall(api);
+
+    if (response?.status === 200 && response.data && response.data.data) {
+      dispatch(actions.createSuccess());
+      meta.onSuccess("Tạo thành công");
+      dispatch(actions.getUsers());
+    } else {
+      dispatch(actions.createFailure());
+      meta.onFailure("Tạo không thành công! Vui lòng thử lại.");
+    }
+  },
+
+  editUser: (id, payload, meta) => async (dispatch) => {
+    const api = API_URLS.USER.editUser(id, payload);
+    const { response } = await apiCall(api);
+
+    if (
+      response?.status === 200 &&
+      response.data &&
+      response.data.data &&
+      response.data.message.status === "success"
+    ) {
+      meta.onSuccess("Cập nhập thành công");
+      dispatch(actions.getUsers());
+    } else {
+      meta.onFailure("Cập nhập không thành công! Vui lòng thử lại.");
+    }
+  },
+
+  forgotPassword: (payload, meta) => async (dispatch) => {
+    const api = API_URLS.USER.forgotPassword(payload);
+    const { response } = await apiCall(api);
+
+    if (
+      response?.status === 200 &&
+      response.data &&
+      response.data.data &&
+      response.data.message.status === "success"
+    ) {
+      meta.onSuccess("Đã gửi email thành công");
+      dispatch(actions.getUsers());
+    } else {
+      meta.onFailure("Đã gửi email không thành công! Vui lòng thử lại.");
+    }
+  },
+
   gettingAll: () => ({
     type: TYPE.GET_ALL,
     meta: { prefix: [STAFF, API_CALLING] },
@@ -58,7 +120,6 @@ export const actions = {
     }
   },
 
-  
   deleting: () => ({
     type: TYPE.DELETE,
     meta: { prefix: [STAFF, API_CALLING] },
@@ -76,7 +137,7 @@ export const actions = {
     const api = API_URLS.USER.deleteUser(id);
     const { response } = await apiCall(api);
 
-    if (response.status === 200 && response.data && response.data.code == 200) {
+    if (response?.status === 200 && response.data && response.data.code == 200) {
       dispatch(actions.deleteSuccess());
       meta.onSuccess("Xoá thành công");
       dispatch(actions.getUsers());
@@ -128,7 +189,6 @@ export const reducer = produce((draft, action) => {
         draft.list = [];
       }
       break;
-
 
     case TYPE.DELETE:
       if (isCallingApi(action)) {

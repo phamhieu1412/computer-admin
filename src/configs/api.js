@@ -241,7 +241,7 @@ export const API_URLS = {
       payload,
     }),
     getDetailProduct: (id) => ({
-      endPoint: `${url}/api/v1/manage/products//${id}`,
+      endPoint: `${url}/api/v1/manage/products/${id}`,
       method: "GET",
       headers: HEADERS.auth_header(),
     }),
@@ -254,7 +254,7 @@ export const API_URLS = {
       endPoint: `${url}/api/v1/manage/products/outOfStock`,
       method: "GET",
       headers: HEADERS.auth_header(),
-      payload
+      payload,
     }),
     getReportProducts: (params) => ({
       endPoint: `${url}/api/v1/manage/products/report`,
@@ -266,6 +266,31 @@ export const API_URLS = {
       endPoint: `${url}/api/v1/manage/products/report/download`,
       method: "GET",
       headers: HEADERS.auth_header(),
+    }),
+  },
+  ORDERS: {
+    getOrders: (params) => ({
+      endPoint: `${url}/api/v1/manage/orders`,
+      method: "GET",
+      headers: HEADERS.auth_header(),
+      params,
+    }),
+    getDetailOrder: (id) => ({
+      endPoint: `${url}/api/v1/manage/orders/${id}`,
+      method: "GET",
+      headers: HEADERS.auth_header(),
+    }),
+    updateStatus: (id, payload) => ({
+      endPoint: `${url}/api/v1/manage/orders/${id}`,
+      method: "PUT",
+      headers: HEADERS.auth_header(),
+      payload,
+    }),
+    cancelOrder: (id, payload) => ({
+      endPoint: `${url}/api/v1/manage/orders/${id}`,
+      method: "PUT",
+      headers: HEADERS.auth_header(),
+      payload,
     }),
   },
 };

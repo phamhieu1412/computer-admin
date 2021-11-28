@@ -48,15 +48,5 @@
     "display_name": "Quản lý đơn hàng",
     "route": "/orders",
     "icon": "bx bx-box"
-  },
-  {
-    "display_name": "Báo cáo tồn kho",
-    "route": "/inventory",
-    "icon": "bx bxs-report"
-  },
-  {
-    "display_name": "Phân quyền",
-    "route": "/decentralization",
-    "icon": "bx bx-shield-quarter"
   }
 ]

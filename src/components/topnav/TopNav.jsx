@@ -52,10 +52,15 @@ const TopNav = (props) => {
     }
   };
 
+  const onLogout = () => {
+    logout();
+    history.push("/login");
+  };
+
   const renderUserMenu = (item, index) => {
     if (item.content === "Logout") {
       return (
-        <a onClick={logout} key={index}>
+        <a onClick={onLogout} key={index}>
           <div className="notification-item">
             <i className={item.icon}></i>
             <span>{item.content}</span>

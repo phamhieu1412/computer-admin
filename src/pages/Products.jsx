@@ -41,13 +41,12 @@ const customerTableHead = [
 const Products = () => {
   const dispatch = useDispatch();
   const productReducer = useSelector((state) => state.ProductReducer);
-  const { list, isFetching, meta } = productReducer;
+  const { list, isFetching, meta, detail, isFetchingDetail } = productReducer;
   const [visibleModal, setVisibleModal] = useState(false);
   const [visibleModalCreate, setVisibleModalCreate] = useState(false);
   const [visibleOutOfStock, setVisibleOutOfStock] = useState(false);
   const [visibleInventory, setVisibleInventory] = useState(false);
   const [selectedFile, setSelectedFile] = useState();
-  const [preview, setPreview] = useState();
   const [pageCur, setPageCur] = useState(1);
   const [infoEdit, setInfoEdit] = useState({});
 
@@ -73,18 +72,6 @@ const Products = () => {
     dispatch(CategoryActions.getCategories());
     dispatch(ManufacturerActions.getManufacturers());
   }, []);
-  useEffect(() => {
-    if (!selectedFile) {
-      setPreview(undefined);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl);
-
-    // free memory when ever this component is unmounted
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile]);
 
   const renderHead = (item, index) => {
     return <th key={index}>{item}</th>;
@@ -187,7 +174,7 @@ const Products = () => {
       )
     );
   };
-  const updateInfo = async (data, dataImg) => {
+  const updateInfo = async (data, dataImg, id) => {
     if (
       data.code === "" ||
       data.description === "" ||
@@ -219,10 +206,10 @@ const Products = () => {
             avatar_url: arrayImg[0] ? `${url}/file/${arrayImg[0]}` : "",
             other_images_url: arrayImg[1] ? `${url}/file/${arrayImg[1]}` : "",
           },
-          data.id,
+          id,
           {
             onSuccess: (text) => {
-              setVisibleModalCreate(false);
+              setVisibleModal(false);
               successNotificationToast(text);
             },
             onFailure: (textError) => {
@@ -235,9 +222,9 @@ const Products = () => {
     }
 
     dispatch(
-      ProductActions.updateCategory(data, data.id, {
+      ProductActions.updateCategory(data, id, {
         onSuccess: (text) => {
-          setVisibleModalCreate(false);
+          setVisibleModal(false);
           successNotificationToast(text);
         },
         onFailure: (textError) => {
@@ -245,25 +232,6 @@ const Products = () => {
         },
       })
     );
-  };
-
-  const onChangeImage = (e) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      setSelectedFile(undefined);
-      return;
-    }
-
-    setSelectedFile(e.target.files[0]);
-  };
-  const onChangeName = (e) => {
-    setInfoEdit({ ...infoEdit, name: e.target.value });
-  };
-  const onChangeDescription = (e) => {
-    setInfoEdit({ ...infoEdit, description: e.target.value });
-  };
-
-  const handleOptionChange = (e) => {
-    setInfoEdit({ ...infoEdit, is_active: e.target.value });
   };
 
   const renderBody = (item, index) => {
@@ -374,11 +342,16 @@ const Products = () => {
         onCancel={closeModal}
         footer={null}
       >
-        <EditProduct
-          infoEdit={infoEdit}
-          onCancelModalCreate={closeModal}
-          updateInfo={updateInfo}
-        />
+        {!isFetchingDetail ? (
+          <EditProduct
+            infoEdit={infoEdit}
+            detail={detail}
+            onCancelModalCreate={closeModal}
+            updateInfo={updateInfo}
+          />
+        ) : (
+          <Loading />
+        )}
       </Modal>
 
       <Modal

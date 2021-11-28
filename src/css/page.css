@@ -94,3 +94,13 @@
 .modal-products.ant-modal {
   width: 800px !important;
 }
+
+.ant-picker-dropdown.ant-picker-dropdown-placement-topLeft
+  .ant-picker-panel-container
+  .ant-picker-panel
+  .ant-picker-datetime-panel
+  .ant-picker-date-panel
+  .ant-picker-body
+  .ant-picker-content {
+  min-width: 0px;
+}

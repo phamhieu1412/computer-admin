@@ -74,7 +74,7 @@ export const actions = {
     const api = API_URLS.CUSTOMER.deleteCustomer(id);
     const { response } = await apiCall(api);
 
-    if (response.status === 200 && response.data && response.data.code == 200) {
+    if (response?.status === 200 && response.data && response.data.code == 200) {
       dispatch(actions.deleteSuccess());
       meta.onSuccess("Xoá thành công");
       dispatch(actions.getCustomers());

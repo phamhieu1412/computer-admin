@@ -64,10 +64,6 @@ const ProductsInventory = ({ visibleInventory }) => {
 
   return (
     <div>
-      <div className="header-title">
-        <h2 className="page-header">Danh sách sản phẩm sắp hết hàng</h2>
-      </div>
-
       <div className="row">
         <div className="col-12">
           <div className="card">

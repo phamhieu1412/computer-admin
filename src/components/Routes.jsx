@@ -11,6 +11,7 @@ import Categories from "../pages/Categories";
 import Receipts from "../pages/Receipts";
 import Users from "../pages/Users";
 import Products from "../pages/Products";
+import Orders from "../pages/Orders";
 
 const Routes = () => {
   return (
@@ -25,9 +26,7 @@ const Routes = () => {
       <Route path="/products" component={Products} />
       <Route path="/staffs" component={Users} />
       <Route path="/customers" component={Customers} />
-      <Route path="/orders" component={Customers} />
-      <Route path="/inventory" component={Customers} />
-      <Route path="/decentralization" component={Customers} />
+      <Route path="/orders" component={Orders} />
     </Switch>
   );
 };

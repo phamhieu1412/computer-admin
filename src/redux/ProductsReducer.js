@@ -42,7 +42,7 @@ export const actions = {
     const { response } = await apiCall(api);
 
     if (
-      response.status === 200 &&
+      response?.status === 200 &&
       response.data &&
       response.data.data &&
       response.data.message.status === "success"
@@ -136,7 +136,7 @@ export const actions = {
     const { response } = await apiCall(api);
 
     if (
-      response.status === 200 &&
+      response?.status === 200 &&
       response.data &&
       response.data.data &&
       response.data.message.status === "success"
@@ -171,7 +171,7 @@ export const actions = {
     const { response } = await apiCall(api);
 
     if (
-      response.status === 200 &&
+      response?.status === 200 &&
       response.data &&
       response.data.code == 200 &&
       response.data.message.status === "success"
@@ -265,6 +265,7 @@ const initialState = {
   isFetching: false,
   list: [],
   detail: {},
+  isFetchingDetail: false,
   meta: {
     page: 1,
     elementOfPage: 10,
@@ -367,18 +368,15 @@ export const reducer = produce((draft, action) => {
 
     case TYPE.GET_DETAIL:
       if (isCallingApi(action)) {
-        // draft.isFetching = true;
+        draft.isFetchingDetail = true;
       }
       if (isSuccessfulApiCall(action)) {
-        // draft.isFetching = false;
-        console.log('xxx qasd', action.payload)
-        // draft.list = action.payload.data.items;
-        // draft.meta.total = action.payload.data.total;
-        // draft.meta.page = action.payload.data.page;
+        draft.isFetchingDetail = false;
+        draft.detail = action.payload;
       }
       if (isFailedApiCall(action)) {
-        // draft.isFetching = false;
-        // draft.list = [];
+        draft.isFetchingDetail = false;
+        draft.detail = {};
       }
       break;
 

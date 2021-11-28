@@ -57,7 +57,7 @@ export const actions = {
         const api = API_URLS.CATEGORIES.createCategory(tempData);
         const { response } = await apiCall(api);
 
-        if (response.status === 200 && response.data && response.data.data) {
+        if (response?.status === 200 && response.data && response.data.data) {
           dispatch(actions.createSuccess());
           meta.onSuccess("Tạo thành công");
           dispatch(actions.getCategories());
@@ -73,7 +73,7 @@ export const actions = {
       const api = API_URLS.CATEGORIES.createCategory(payload);
       const { response } = await apiCall(api);
 
-      if (response.status === 200 && response.data && response.data.data) {
+      if (response?.status === 200 && response.data && response.data.data) {
         dispatch(actions.createSuccess());
         meta.onSuccess("Tạo thành công");
         dispatch(actions.getCategories());
@@ -154,7 +154,7 @@ export const actions = {
         };
         const api = API_URLS.CATEGORIES.updateCategory(id, tempData);
         const { response } = await apiCall(api);
-        if (response.status === 200 && response.data && response.data.data) {
+        if (response?.status === 200 && response.data && response.data.data) {
           const data = response.data.data;
           dispatch(actions.updateSuccess(data));
           meta.onSuccess("Chỉnh sửa thành công");
@@ -170,7 +170,7 @@ export const actions = {
     } else {
       const api = API_URLS.CATEGORIES.updateCategory(id, payload);
       const { response } = await apiCall(api);
-      if (response.status === 200 && response.data && response.data.data) {
+      if (response?.status === 200 && response.data && response.data.data) {
         const data = response.data.data;
         dispatch(actions.updateSuccess(data));
         meta.onSuccess("Chỉnh sửa thành công");
@@ -199,7 +199,7 @@ export const actions = {
     const api = API_URLS.CATEGORIES.deleteCategory(id);
     const { response } = await apiCall(api);
 
-    if (response.status === 200 && response.data && response.data.code == 200) {
+    if (response?.status === 200 && response.data && response.data.code == 200) {
       dispatch(actions.deleteSuccess());
       meta.onSuccess("Xoá thành công");
       dispatch(actions.getCategories());
