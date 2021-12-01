@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 
 import "../css/login.css";
 import "react-toastify/dist/ReactToastify.css";
+import Loading from "../components/loading/Loading";
 import { actions as AuthActions } from "../redux/AuthReducer";
 
 const notificationToast = (text) =>
@@ -20,6 +21,8 @@ const notificationToast = (text) =>
 
 const Login = () => {
   const dispatch = useDispatch();
+  const authReducer = useSelector((state) => state.AuthReducer);
+  const { isFetching } = authReducer;
   const history = useHistory();
   const [info, setInfo] = useState({ email: "", password: "" });
 
@@ -78,6 +81,23 @@ const Login = () => {
           <input type="submit" value="Đăng Nhập" />
         </div>
       </form>
+
+      {isFetching && (
+        <div
+          style={{
+            backgroundColor: "rgba(0,0,0,0.3)",
+            position: "absolute",
+            top: "0",
+            left: "0",
+            right: "0",
+            bottom: "0",
+            zIndex: 11,
+            height: "200vh",
+          }}
+        >
+          <Loading />
+        </div>
+      )}
     </div>
   );
 };
