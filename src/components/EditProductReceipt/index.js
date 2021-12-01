@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../../css/page.css";
 import "antd/dist/antd.css";
 import { Table, Input, InputNumber, Popconfirm, Form, Typography } from "antd";
 const originData = [];
@@ -34,7 +35,7 @@ const EditableCell = ({
           rules={[
             {
               required: true,
-              message: `Please Input ${title}!`,
+              message: `Hãy nhập ${title}!`,
             },
           ]}
         >
@@ -47,7 +48,10 @@ const EditableCell = ({
   );
 };
 
-const EditableTable = () => {
+const EditableTable = ({
+  dataTempChooseProducts,
+  setDataTempChooseProducts,
+}) => {
   const [form] = Form.useForm();
   const [data, setData] = useState(originData);
   const [editingKey, setEditingKey] = useState("");
@@ -56,14 +60,17 @@ const EditableTable = () => {
 
   const edit = (record) => {
     form.setFieldsValue({
-      name: "",
-      age: "",
-      address: "",
+      label: "",
+      quantity: "",
+      price: "",
       ...record,
     });
     setEditingKey(record.key);
   };
-
+  const handleDelete = (key) => {
+    const dataSource = [...dataTempChooseProducts];
+    setDataTempChooseProducts(dataSource.filter((item) => item.key !== key));
+  };
   const cancel = () => {
     setEditingKey("");
   };
@@ -91,50 +98,41 @@ const EditableTable = () => {
 
   const columns = [
     {
-      title: "name",
-      dataIndex: "name",
-      width: "25%",
-      editable: true,
+      title: "id",
+      dataIndex: "key",
+      width: "5%",
     },
     {
-      title: "age",
-      dataIndex: "age",
-      width: "15%",
-      editable: true,
-    },
-    {
-      title: "address",
-      dataIndex: "address",
+      title: "Tên",
+      dataIndex: "label",
       width: "40%",
+    },
+    {
+      title: "Số lượng",
+      dataIndex: "quantity",
+      width: "20%",
       editable: true,
     },
     {
-      title: "operation",
+      title: "Đơn giá",
+      dataIndex: "price",
+      width: "20%",
+      editable: true,
+    },
+    {
+      title: "Action",
       dataIndex: "operation",
       render: (_, record) => {
         const editable = isEditing(record);
-        return editable ? (
-          <span>
-            <a
-              href="javascript:;"
-              onClick={() => save(record.key)}
-              style={{
-                marginRight: 8,
-              }}
+        return (
+          editable && (
+            <Popconfirm
+              title="Bạn muốn xoá?"
+              onConfirm={() => handleDelete(record.key)}
             >
-              Save
-            </a>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a>Cancel</a>
+              <a>Xoá</a>
             </Popconfirm>
-          </span>
-        ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => edit(record)}
-          >
-            Edit
-          </Typography.Link>
+          )
         );
       },
     },
@@ -164,7 +162,7 @@ const EditableTable = () => {
           },
         }}
         bordered
-        dataSource={[]}
+        dataSource={dataTempChooseProducts}
         columns={mergedColumns}
         rowClassName="editable-row"
         pagination={{

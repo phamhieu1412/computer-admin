@@ -44,6 +44,29 @@ export const apiCall = async ({ endPoint, method, payload, headers, params }) =>
   }
 };
 
+export const apiCallDebounce = async ({ endPoint, method, payload, headers, params }) => {
+  try {
+    const result = await axios({
+      method,
+      url: endPoint,
+      headers,
+      data: payload,
+      params,
+      paramsSerializer: (params) => parseParams(params),
+    });
+    return {
+      response: result,
+      error: null,
+    };
+  } catch (e) {
+    return {
+      response: null,
+      status: e.request.status,
+      error: e.request,
+    };
+  }
+};
+
 export const apiCallPromise = ({ endPoint, method, payload, headers, params }) =>
   axios({
     method,

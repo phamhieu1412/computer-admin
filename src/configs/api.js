@@ -1,4 +1,4 @@
-export const url = "http://5a52-210-245-54-40.ngrok.io";
+export const url = "http://a03a-210-245-54-40.ngrok.io";
 
 export const HEADERS = {
   default_header: () => ({
@@ -72,6 +72,11 @@ export const API_URLS = {
       method: "GET",
       headers: HEADERS.auth_header(),
       params,
+    }),
+    getDetailCustomer: (id) => ({
+      endPoint: `${url}/api/v1/manage/customers/${id}`,
+      method: "GET",
+      headers: HEADERS.auth_header(),
     }),
     deleteCustomer: (id) => ({
       endPoint: `${url}/api/v1/manage/customers/${id}`,

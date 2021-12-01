@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
-// import Modal from "react-modal";
 import { Pagination, Modal } from "antd";
 
 import "react-toastify/dist/ReactToastify.css";
@@ -18,9 +17,9 @@ import CreateProduct from "../components/product/CreateProduct";
 import EditProduct from "../components/product/EditProduct";
 import OutOfStock from "../components/product/OutOfStock";
 import ProductsInventory from "../components/product/ProductsInventory";
+import FilterContent from "../components/product/FilterContent";
 import {
   numToDate,
-  customStyles,
   notificationToast,
   successNotificationToast,
   numberToVnd,
@@ -41,11 +40,13 @@ const customerTableHead = [
 const Products = () => {
   const dispatch = useDispatch();
   const productReducer = useSelector((state) => state.ProductReducer);
-  const { list, isFetching, meta, detail, isFetchingDetail } = productReducer;
+  const { list, isFetching, meta, detail, isFetchingDetail, filter } =
+    productReducer;
   const [visibleModal, setVisibleModal] = useState(false);
   const [visibleModalCreate, setVisibleModalCreate] = useState(false);
   const [visibleOutOfStock, setVisibleOutOfStock] = useState(false);
   const [visibleInventory, setVisibleInventory] = useState(false);
+  const [visibleFilter, setVisibleFilter] = useState(false);
   const [selectedFile, setSelectedFile] = useState();
   const [pageCur, setPageCur] = useState(1);
   const [infoEdit, setInfoEdit] = useState({});
@@ -53,6 +54,7 @@ const Products = () => {
   useEffect(() => {
     dispatch(
       ProductActions.getProducts({
+        ...filter,
         page: 1,
         page_size: 10,
       })
@@ -120,11 +122,14 @@ const Products = () => {
     setVisibleOutOfStock(false);
     setVisibleInventory(false);
   };
+  const closeModalFilter = () => {
+    setVisibleFilter(false);
+  };
   const onChangePage = (page, pageSize) => {
     setPageCur(page);
     dispatch(
       ProductActions.getProducts({
-        // ...meta,
+        ...filter,
         page: page,
         page_size: pageSize,
       })
@@ -280,6 +285,12 @@ const Products = () => {
           <a className="btn-header-title" onClick={createItem}>
             <i className="bx bx-add-to-queue" style={{ color: "white" }}></i>
           </a>
+          <a
+            className="btn-header-title"
+            onClick={() => setVisibleFilter(true)}
+          >
+            <i className="bx bx-filter-alt" style={{ color: "white" }}></i>
+          </a>
         </div>
         <div className="action-header-title">
           <a
@@ -334,6 +345,16 @@ const Products = () => {
           </div>
         </div>
       </div>
+
+      <Modal
+        title="Tìm kiếm theo"
+        visible={visibleFilter}
+        onOk={closeModalFilter}
+        onCancel={closeModalFilter}
+        footer={null}
+      >
+        <FilterContent onCancelModalCreate={closeModalFilter} />
+      </Modal>
 
       <Modal
         title="Cập nhập thông tin"

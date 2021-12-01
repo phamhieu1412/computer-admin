@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import Modal from "react-modal";
+import { Switch } from "antd";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../css/page.css";
@@ -9,6 +10,7 @@ import { actions as CustomerActions } from "../redux/CustomersReducer";
 
 import Table from "../components/table/Table";
 import Loading from "../components/loading/Loading";
+import FilterContent from "../components/customer/FilterContent";
 import {
   numToDate,
   customStyles,
@@ -27,39 +29,16 @@ const customerTableHead = [
 const Customers = () => {
   const dispatch = useDispatch();
   const customerReducer = useSelector((state) => state.CustomerReducer);
-  const { list, isFetching } = customerReducer;
+  const { list, isFetching, isFetchingDetail, detail } = customerReducer;
   const [visibleModal, setVisibleModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState();
-  const [preview, setPreview] = useState();
-  const [infoEdit, setInfoEdit] = useState({});
+  const [visibleModalFilter, setVisibleModalFilter] = useState(false);
 
   useEffect(() => {
     dispatch(CustomerActions.getCustomers());
   }, []);
-  useEffect(() => {
-    if (!selectedFile) {
-      setPreview(undefined);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl);
-
-    // free memory when ever this component is unmounted
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile]);
 
   const renderHead = (item, index) => {
     return <th key={index}>{item}</th>;
-  };
-
-  const createItem = (item) => {
-    setInfoEdit({});
-    openModal();
-  };
-  const editItem = (item) => {
-    setInfoEdit(item);
-    openModal();
   };
   const deleteItem = (id) => {
     dispatch(
@@ -78,75 +57,13 @@ const Customers = () => {
     setVisibleModal(true);
   };
   const closeModal = () => {
-    setSelectedFile(undefined);
     setVisibleModal(false);
+    setVisibleModalFilter(false);
   };
 
-  const addNewInfo = () => {
-    // dispatch(
-    //   CustomerActions.createBanner(
-    //     {
-    //       name: infoEdit.name ? infoEdit.name : "",
-    //       image_url: "",
-    //       description: infoEdit.description ? infoEdit.description : "",
-    //       is_active: infoEdit.is_active,
-    //       url: "#",
-    //     },
-    //     selectedFile,
-    //     {
-    //       onSuccess: (text) => {
-    //         closeModal();
-    //         successNotificationToast(text);
-    //       },
-    //       onFailure: (textError) => {
-    //         notificationToast(textError);
-    //       },
-    //     }
-    //   )
-    // );
-  };
-  const updateInfo = () => {
-    // dispatch(
-    //   CustomerActions.updateBanner(
-    //     infoEdit.id,
-    //     {
-    //       description: infoEdit.description,
-    //       is_active: infoEdit.is_active,
-    //       name: infoEdit.name,
-    //       image_url: infoEdit.image_url,
-    //       url: "#",
-    //     },
-    //     selectedFile,
-    //     {
-    //       onSuccess: (text) => {
-    //         closeModal();
-    //         successNotificationToast(text);
-    //       },
-    //       onFailure: (textError) => {
-    //         notificationToast(textError);
-    //       },
-    //     }
-    //   )
-    // );
-  };
-
-  const onChangeImage = (e) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      setSelectedFile(undefined);
-      return;
-    }
-
-    setSelectedFile(e.target.files[0]);
-  };
-  const onChangeName = (e) => {
-    setInfoEdit({ ...infoEdit, name: e.target.value });
-  };
-  const onChangeDescription = (e) => {
-    setInfoEdit({ ...infoEdit, description: e.target.value });
-  };
-
-  const handleOptionChange = (e) => {
-    setInfoEdit({ ...infoEdit, is_active: e.target.value });
+  const detailCustomer = (id) => {
+    dispatch(CustomerActions.getDetailCustomer(id));
+    setVisibleModal(true);
   };
 
   const renderBody = (item, index) => {
@@ -158,11 +75,14 @@ const Customers = () => {
         <td>{numToDate(item.created_date)}</td>
         <td>
           <div style={{ display: "flex", displayDirection: "row" }}>
-            <a style={{ width: "40px" }} onClick={() => editItem(item)}>
+            <a
+              style={{ width: "40px" }}
+              onClick={() => detailCustomer(item.id)}
+            >
               <div style={{ padding: "0px" }} className="notification-item">
                 <i
                   style={{ marginRight: "0px" }}
-                  className="bx bx-edit-alt"
+                  className="bx bx-list-ul"
                 ></i>
               </div>
             </a>
@@ -181,8 +101,11 @@ const Customers = () => {
     <div>
       <div className="header-title">
         <h2 className="page-header">Quản lý khách hàng</h2>
-        <a className="btn-header-title" onClick={createItem}>
-          <i className="bx bx-add-to-queue" style={{ color: "white" }}></i>
+        <a
+          className="btn-header-title"
+          onClick={() => setVisibleModalFilter(true)}
+        >
+          <i className="bx bx-filter-alt" style={{ color: "white" }}></i>
         </a>
       </div>
 
@@ -205,94 +128,143 @@ const Customers = () => {
           </div>
         </div>
       </div>
+
+      <Modal
+        isOpen={visibleModalFilter}
+        onRequestClose={closeModal}
+        style={customStyles}
+      >
+        <div className="modal-banner" style={{ width: "500px" }}>
+          <h2 className="header-item-edit">Tìm kiếm theo</h2>
+          <FilterContent onCancelModalCreate={closeModal} />
+        </div>
+      </Modal>
+
       <Modal
         isOpen={visibleModal}
         onRequestClose={closeModal}
         style={customStyles}
-        contentLabel="Example Modal"
       >
-        <div className="modal-banner">
-          <h2 className="header-item-edit">Cập nhập thông tin</h2>
-          {infoEdit.id && (
-            <div className="id-item-edit">
-              <h4>id</h4>
-              <p style={{ opacity: 0.5 }}>{infoEdit.id}</p>
-            </div>
+        <div className="modal-banner" style={{ width: "500px" }}>
+          <h2 className="header-item-edit">Thông tin khách hàng</h2>
+          {isFetchingDetail ? (
+            <Loading />
+          ) : (
+            <>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="id-item-edit" style={{ width: "47%" }}>
+                  <h4>id</h4>
+                  <input
+                    type="text"
+                    disabled={true}
+                    style={{ opacity: "0.6" }}
+                    value={detail.id}
+                  />
+                </div>
+                <div className="id-item-edit" style={{ width: "47%" }}>
+                  <h4>Tên</h4>
+                  <input
+                    type="text"
+                    disabled={true}
+                    style={{ opacity: "0.6" }}
+                    value={detail.full_name}
+                  />
+                </div>
+              </div>
+
+              <div className="id-item-edit">
+                <h4>Ảnh</h4>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <img src={detail.avatar_url} style={{ width: "100px" }} />
+                </div>
+              </div>
+              <div className="id-item-edit">
+                <h4>Địa chỉ</h4>
+                <input
+                  type="text"
+                  disabled={true}
+                  style={{ opacity: "0.6" }}
+                  value={`${detail.ward}, ${detail.district}, ${detail.province}`}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="id-item-edit" style={{ width: "47%" }}>
+                  <h4>Email</h4>
+                  <input
+                    type="text"
+                    disabled={true}
+                    style={{ opacity: "0.6" }}
+                    value={detail.email}
+                  />
+                </div>
+                <div className="id-item-edit" style={{ width: "47%" }}>
+                  <h4>Số điện thoại</h4>
+                  <input
+                    type="text"
+                    disabled={true}
+                    style={{ opacity: "0.6" }}
+                    value={detail.phone}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="id-item-edit" style={{ width: "47%" }}>
+                  <h4>Giới tính</h4>
+                  <input
+                    type="text"
+                    disabled={true}
+                    style={{ opacity: "0.6" }}
+                    value={detail.gender ? "Nam" : "Nữ"}
+                  />
+                </div>
+                <div className="id-item-edit" style={{ width: "47%" }}>
+                  <h4>Ngày tạo</h4>
+                  <input
+                    type="text"
+                    disabled={true}
+                    style={{ opacity: "0.6" }}
+                    value={numToDate(detail.created_date)}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="id-item-edit" style={{ width: "47%" }}>
+                  <h4>Ngày cập nhập thông tin</h4>
+                  <input
+                    type="text"
+                    disabled={true}
+                    style={{ opacity: "0.6" }}
+                    value={numToDate(detail.modified_date)}
+                  />
+                </div>
+                <div className="id-item-edit" style={{ width: "47%" }}>
+                  <h4>Ngày cập nhập mật khẩu</h4>
+                  <input
+                    type="text"
+                    disabled={true}
+                    style={{ opacity: "0.6" }}
+                    value={numToDate(detail.modified_date_password)}
+                  />
+                </div>
+              </div>
+
+              <div className="id-item-edit">
+                <h4>Active</h4>
+                <Switch checked={detail.is_active} disabled={true} />
+              </div>
+              <div
+                className="action-modal"
+                style={{ justifyContent: "flex-end" }}
+              >
+                <button className="close" onClick={closeModal}>
+                  Đóng
+                </button>
+              </div>
+            </>
           )}
-          <div className="id-item-edit">
-            <h4>Tên</h4>
-            <input
-              placeholder="Nhập tên"
-              type="text"
-              onChange={onChangeName}
-              value={infoEdit.name && infoEdit.name}
-            />
-          </div>
-          <div className="id-item-edit">
-            <h4>Ảnh</h4>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              {selectedFile ? (
-                <img src={preview} style={{ width: "100px" }} />
-              ) : (
-                infoEdit.image_url && (
-                  <img src={infoEdit.image_url} style={{ width: "100px" }} />
-                )
-              )}
-              <input type="file" accept="image/*" onChange={onChangeImage} />
-            </div>
-          </div>
-          <div className="id-item-edit">
-            <h4>Mô tả</h4>
-            <input
-              placeholder="Nhập mô tả"
-              type="text"
-              onChange={onChangeDescription}
-              value={infoEdit.description && infoEdit.description}
-            />
-          </div>
-          <div className="id-item-edit">
-            <h4>Active</h4>
-            <div>
-              <input
-                type="radio"
-                value="true"
-                name="active"
-                onChange={handleOptionChange}
-                checked={
-                  (infoEdit.is_active == true ||
-                    infoEdit.is_active == "true") &&
-                  "true"
-                }
-              />
-              <input
-                type="radio"
-                value="false"
-                name="active"
-                onChange={handleOptionChange}
-                checked={
-                  (infoEdit.is_active == false ||
-                    infoEdit.is_active == "false") &&
-                  "false"
-                }
-              />
-            </div>
-          </div>
-          <div className="action-modal">
-            <button
-              className="update"
-              onClick={infoEdit.id ? updateInfo : addNewInfo}
-              disabled={isFetching === true ? true : false}
-            >
-              {infoEdit.id ? "Cập nhập" : "Thêm mới"}
-            </button>
-            <button
-              className="close"
-              onClick={closeModal}
-              disabled={isFetching === true ? true : false}
-            >
-              Đóng
-            </button>
-          </div>
         </div>
       </Modal>
       <ToastContainer />

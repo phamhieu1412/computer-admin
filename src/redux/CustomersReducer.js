@@ -16,6 +16,7 @@ const { API_CALLING, API_CALLED_SUCCESS, API_CALLED_FAILURE, CUSTOMER } =
 const _types = typesWithPrefix(CUSTOMER);
 const TYPE = {
   GET_ALL: _types("GET_ALL"),
+  GET_DETAIL: _types("GET_DETAIL"),
   DELETE: _types("DELETE"),
 };
 
@@ -33,9 +34,9 @@ export const actions = {
     type: TYPE.GET_ALL,
     meta: { prefix: [CUSTOMER, API_CALLED_FAILURE] },
   }),
-  getCustomers: () => async (dispatch) => {
+  getCustomers: (params) => async (dispatch) => {
     dispatch(actions.gettingAll());
-    const api = API_URLS.CUSTOMER.getCustomers();
+    const api = API_URLS.CUSTOMER.getCustomers(params);
     const { response, status } = await apiCall(api);
 
     if (
@@ -46,7 +47,7 @@ export const actions = {
       const status = response.data.message.status;
       if (status === "success") {
         const data = response.data.data;
-        dispatch(actions.getAllSuccess(data));
+        dispatch(actions.getAllSuccess({ data, filter: params }));
       } else {
         dispatch(actions.getAllFailure());
       }
@@ -54,6 +55,43 @@ export const actions = {
       dispatch(AuthActions.logOut());
     } else {
       dispatch(actions.getAllFailure());
+    }
+  },
+
+  gettingDetail: () => ({
+    type: TYPE.GET_DETAIL,
+    meta: { prefix: [CUSTOMER, API_CALLING] },
+  }),
+  getDetailSuccess: (payload) => ({
+    type: TYPE.GET_DETAIL,
+    meta: { prefix: [CUSTOMER, API_CALLED_SUCCESS] },
+    payload,
+  }),
+  getDetailFailure: () => ({
+    type: TYPE.GET_DETAIL,
+    meta: { prefix: [CUSTOMER, API_CALLED_FAILURE] },
+  }),
+  getDetailCustomer: (id) => async (dispatch) => {
+    dispatch(actions.gettingDetail());
+    const api = API_URLS.CUSTOMER.getDetailCustomer(id);
+    const { response, status } = await apiCall(api);
+
+    if (
+      response?.status === 200 &&
+      response.data &&
+      response.data.code === 200
+    ) {
+      const status = response.data.message.status;
+      if (status === "success") {
+        const data = response.data.data;
+        dispatch(actions.getDetailSuccess(data));
+      } else {
+        dispatch(actions.getDetailFailure());
+      }
+    } else if (status && status === 401) {
+      dispatch(AuthActions.logOut());
+    } else {
+      dispatch(actions.getDetailFailure());
     }
   },
 
@@ -74,7 +112,11 @@ export const actions = {
     const api = API_URLS.CUSTOMER.deleteCustomer(id);
     const { response } = await apiCall(api);
 
-    if (response?.status === 200 && response.data && response.data.code == 200) {
+    if (
+      response?.status === 200 &&
+      response.data &&
+      response.data.code == 200
+    ) {
       dispatch(actions.deleteSuccess());
       meta.onSuccess("Xoá thành công");
       dispatch(actions.getCustomers());
@@ -89,12 +131,14 @@ const initialState = {
   isFetching: false,
   list: [],
   detail: {},
+  isFetchingDetail: false,
   meta: {
     page: 1,
     elementOfPage: 10,
     total: 0,
     total_pages: 0,
   },
+  filter: {},
 };
 
 export const reducer = produce((draft, action) => {
@@ -105,13 +149,28 @@ export const reducer = produce((draft, action) => {
       }
       if (isSuccessfulApiCall(action)) {
         draft.isFetching = false;
-        draft.list = action.payload.items;
+        draft.list = action.payload.data.items;
+        draft.filter = action.payload.filter;
         draft.meta.total = action.payload.total;
         draft.meta.total_pages = action.payload.total_pages;
       }
       if (isFailedApiCall(action)) {
         draft.isFetching = false;
         draft.list = [];
+      }
+      break;
+
+    case TYPE.GET_DETAIL:
+      if (isCallingApi(action)) {
+        draft.isFetchingDetail = true;
+      }
+      if (isSuccessfulApiCall(action)) {
+        draft.isFetchingDetail = false;
+        draft.detail = action.payload;
+      }
+      if (isFailedApiCall(action)) {
+        draft.isFetchingDetail = false;
+        draft.detail = {};
       }
       break;
 

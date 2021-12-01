@@ -9,77 +9,31 @@ import {
 } from "./actionDedicate";
 import { PREFIX, typesWithPrefix } from "./config";
 import { url } from "..//configs/api";
-import { actions as AppActions } from "../redux/AppRedux";
+import { actions as AuthActions } from "../redux/AuthReducer";
 
-const { API_CALLING, API_CALLED_SUCCESS, API_CALLED_FAILURE, RECEIPTS } = PREFIX;
+const { API_CALLING, API_CALLED_SUCCESS, API_CALLED_FAILURE, RECEIPTS } =
+  PREFIX;
 
 const _types = typesWithPrefix(RECEIPTS);
 const TYPE = {
   CREATE: _types("CREATE"),
   GET_ID: _types("GET_ID"),
   GET_ALL: _types("GET_ALL"),
+  GET_DETAIL: _types("GET_DETAIL"),
 };
 
 export const actions = {
-  creating: () => ({
-    type: TYPE.CREATE,
-    meta: { prefix: [RECEIPTS, API_CALLING] },
-  }),
-  createSuccess: () => ({
-    type: TYPE.CREATE,
-    meta: { prefix: [RECEIPTS, API_CALLED_SUCCESS] },
-  }),
-  createFailure: () => ({
-    type: TYPE.CREATE,
-    meta: { prefix: [RECEIPTS, API_CALLED_FAILURE] },
-  }),
-  // createManufacturer: (payload, urlImage, meta) => async (dispatch) => {
-  //   dispatch(actions.creating());
+  createReceipt: (payload, meta) => async (dispatch) => {
+    const api = API_URLS.RECEIPTS.createReceipt(payload);
+    const { response } = await apiCall(api);
 
-  //   let hasImg = false;
-  //   if (urlImage) {
-  //     hasImg = true;
-  //   } else {
-  //     hasImg = false;
-  //   }
-
-  //   if (hasImg) {
-  //     const res = await dispatch(AppActions.uploadImage(urlImage));
-
-  //     if (res && res.data && res.data.resource_id) {
-  //       const tempData = {
-  //         ...payload,
-  //         image_url: `${url}/file/${res.data.resource_id}`,
-  //       };
-  //       const api = API_URLS.RECEIPTS.createManufacturer(tempData);
-  //       const { response } = await apiCall(api);
-
-  //       if (response.status === 200 && response.data && response.data.data) {
-  //         dispatch(actions.createSuccess());
-  //         meta.onSuccess("Tạo thành công");
-  //         dispatch(actions.getReceipts());
-  //       } else {
-  //         dispatch(actions.createFailure());
-  //         meta.onFailure("Tạo không thành công! Vui lòng thử lại.");
-  //       }
-  //     } else {
-  //       dispatch(actions.updateFailure());
-  //       meta.onFailure("Upload ảnh không thành công! Vui lòng thử lại.");
-  //     }
-  //   } else {
-  //     const api = API_URLS.RECEIPTS.createManufacturer(payload);
-  //     const { response } = await apiCall(api);
-
-  //     if (response.status === 200 && response.data && response.data.data) {
-  //       dispatch(actions.createSuccess());
-  //       meta.onSuccess("Tạo thành công");
-  //       dispatch(actions.getReceipts());
-  //     } else {
-  //       dispatch(actions.createFailure());
-  //       meta.onFailure("Tạo không thành công! Vui lòng thử lại.");
-  //     }
-  //   }
-  // },
+    if (response.status === 200 && response.data && response.data.data) {
+      meta.onSuccess("Tạo thành công");
+      dispatch(actions.getReceipts());
+    } else {
+      meta.onFailure("Tạo không thành công! Vui lòng thử lại.");
+    }
+  },
 
   gettingAll: () => ({
     type: TYPE.GET_ALL,
@@ -115,12 +69,50 @@ export const actions = {
       dispatch(actions.getAllFailure());
     }
   },
+
+  gettingDetail: () => ({
+    type: TYPE.GET_DETAIL,
+    meta: { prefix: [RECEIPTS, API_CALLING] },
+  }),
+  getDetailSuccess: (payload) => ({
+    type: TYPE.GET_DETAIL,
+    meta: { prefix: [RECEIPTS, API_CALLED_SUCCESS] },
+    payload,
+  }),
+  getDetailFailure: () => ({
+    type: TYPE.GET_DETAIL,
+    meta: { prefix: [RECEIPTS, API_CALLED_FAILURE] },
+  }),
+  getDetailReceipt: (id) => async (dispatch) => {
+    dispatch(actions.gettingDetail());
+    const api = API_URLS.RECEIPTS.getDetailReceipt(id);
+    const { response, status } = await apiCall(api);
+
+    if (
+      response?.status === 200 &&
+      response.data &&
+      response.data.code === 200
+    ) {
+      const status = response.data.message.status;
+      if (status === "success") {
+        const data = response.data.data;
+        dispatch(actions.getDetailSuccess(data));
+      } else {
+        dispatch(actions.getDetailFailure());
+      }
+    } else if (status && status === 401) {
+      dispatch(AuthActions.logOut());
+    } else {
+      dispatch(actions.getDetailFailure());
+    }
+  },
 };
 
 const initialState = {
   isFetching: false,
   list: [],
   detail: {},
+  isFetchingDetail: false,
   meta: {
     page: 1,
     elementOfPage: 10,
@@ -139,6 +131,20 @@ export const reducer = produce((draft, action) => {
       }
       if (isFailedApiCall(action)) {
         draft.isFetching = false;
+      }
+      break;
+
+    case TYPE.GET_DETAIL:
+      if (isCallingApi(action)) {
+        draft.isFetchingDetail = true;
+      }
+      if (isSuccessfulApiCall(action)) {
+        draft.isFetchingDetail = false;
+        draft.detail = action.payload;
+      }
+      if (isFailedApiCall(action)) {
+        draft.isFetchingDetail = false;
+        draft.detail = {};
       }
       break;
 

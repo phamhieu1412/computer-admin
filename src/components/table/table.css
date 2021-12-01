@@ -4,7 +4,7 @@
 
 table {
     width: 100%;
-    min-width: 400px;
+    /* min-width: 400px; */
     border-spacing: 0;
 }
 
@@ -23,8 +23,8 @@ td {
 }
 
 tbody > tr:hover {
-    background-color: var(--main-color);
-    color: var(--txt-white);
+    /* background-color: var(--main-color); */
+    color: var(--main-color-blue);
 }
 
 .table__pagination {

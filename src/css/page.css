@@ -102,5 +102,5 @@
   .ant-picker-date-panel
   .ant-picker-body
   .ant-picker-content {
-  min-width: 0px;
+  min-width: 0px !important;
 }

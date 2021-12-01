@@ -242,10 +242,7 @@ const Products = () => {
         onCancel={closeModal}
         footer={null}
       >
-        <FilterContent
-          onCancelModalCreate={closeModal}
-          updateInfo={updateInfo}
-        />
+        <FilterContent onCancelModalCreate={closeModal} />
       </Modal>
 
       <Modal

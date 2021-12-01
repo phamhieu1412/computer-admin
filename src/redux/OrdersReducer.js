@@ -41,7 +41,6 @@ export const actions = {
     const api = API_URLS.ORDERS.getOrders(params);
     const { response, status } = await apiCall(api);
 
-    console.log("xxx status", status, response);
     if (
       response?.status === 200 &&
       response.data &&

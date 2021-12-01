@@ -87,7 +87,19 @@ export const actions = {
       const status = response.data.message.status;
       if (status === "success") {
         const data = response.data.data;
-        dispatch(actions.getAllSuccess({ data, page: payload.page }));
+        dispatch(
+          actions.getAllSuccess({
+            data,
+            page: payload.page,
+            filter: {
+              sort: payload.sort && payload.sort,
+              order_by: payload.order_by && payload.order_by,
+              category_id: payload.category_id && payload.category_id,
+              manufacturer_id:
+                payload.manufacturer_id && payload.manufacturer_id,
+            },
+          })
+        );
       } else {
         dispatch(actions.getAllFailure());
       }
@@ -280,6 +292,7 @@ const initialState = {
     elementOfPage: 10,
     total: 0,
   },
+  filter: {},
 };
 
 export const reducer = produce((draft, action) => {
@@ -305,6 +318,7 @@ export const reducer = produce((draft, action) => {
         draft.list = action.payload.data.items;
         draft.meta.total = action.payload.data.total;
         draft.meta.page = action.payload.data.page;
+        draft.filter = action.payload.filter;
       }
       if (isFailedApiCall(action)) {
         draft.isFetching = false;

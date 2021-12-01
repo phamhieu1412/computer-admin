@@ -98,9 +98,9 @@ export const actions = {
     type: TYPE.GET_ALL,
     meta: { prefix: [STAFF, API_CALLED_FAILURE] },
   }),
-  getUsers: () => async (dispatch) => {
+  getUsers: (params) => async (dispatch) => {
     dispatch(actions.gettingAll());
-    const api = API_URLS.USER.getUsers();
+    const api = API_URLS.USER.getUsers(params);
     const { response } = await apiCall(api);
 
     if (
@@ -111,7 +111,7 @@ export const actions = {
       const status = response.data.message.status;
       if (status === "success") {
         const data = response.data.data;
-        dispatch(actions.getAllSuccess(data));
+        dispatch(actions.getAllSuccess({ data, filter: params }));
       } else {
         dispatch(actions.getAllFailure());
       }
@@ -137,7 +137,11 @@ export const actions = {
     const api = API_URLS.USER.deleteUser(id);
     const { response } = await apiCall(api);
 
-    if (response?.status === 200 && response.data && response.data.code == 200) {
+    if (
+      response?.status === 200 &&
+      response.data &&
+      response.data.code == 200
+    ) {
       dispatch(actions.deleteSuccess());
       meta.onSuccess("Xoá thành công");
       dispatch(actions.getUsers());
@@ -158,6 +162,7 @@ const initialState = {
     total: 0,
     total_pages: 0,
   },
+  filter: {},
 };
 
 export const reducer = produce((draft, action) => {
@@ -180,7 +185,8 @@ export const reducer = produce((draft, action) => {
       }
       if (isSuccessfulApiCall(action)) {
         draft.isFetching = false;
-        draft.list = action.payload.items;
+        draft.list = action.payload.data.items;
+        draft.filter = action.payload.filter;
         draft.meta.total = action.payload.total;
         draft.meta.total_pages = action.payload.total_pages;
       }

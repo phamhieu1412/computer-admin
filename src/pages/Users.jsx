@@ -10,6 +10,7 @@ import { actions as UserActions } from "../redux/UsersReducer";
 
 import Table from "../components/table/Table";
 import Loading from "../components/loading/Loading";
+import FilterContent from "../components/user/FilterContent";
 import {
   numToDate,
   customStyles,
@@ -34,6 +35,7 @@ const Users = () => {
   const [visibleModal, setVisibleModal] = useState(false);
   const [infoEdit, setInfoEdit] = useState({});
   const [email, setEmail] = useState("");
+  const [visibleModalFilter, setVisibleModalFilter] = useState(false);
 
   useEffect(() => {
     dispatch(UserActions.getUsers());
@@ -86,6 +88,7 @@ const Users = () => {
   };
   const closeModal = () => {
     setVisibleModal(false);
+    setVisibleModalFilter(false);
   };
 
   const addNewInfo = () => {
@@ -215,6 +218,12 @@ const Users = () => {
         <a className="btn-header-title" onClick={createItem}>
           <i className="bx bx-add-to-queue" style={{ color: "white" }}></i>
         </a>
+        <a
+          className="btn-header-title"
+          onClick={() => setVisibleModalFilter(true)}
+        >
+          <i className="bx bx-filter-alt" style={{ color: "white" }}></i>
+        </a>
       </div>
 
       <div className="row">
@@ -236,6 +245,18 @@ const Users = () => {
           </div>
         </div>
       </div>
+
+      <Modal
+        isOpen={visibleModalFilter}
+        onRequestClose={closeModal}
+        style={customStyles}
+      >
+        <div className="modal-banner" style={{ width: "500px" }}>
+          <h2 className="header-item-edit">Tìm kiếm theo</h2>
+          <FilterContent onCancelModalCreate={closeModal} />
+        </div>
+      </Modal>
+
       <Modal
         isOpen={visibleModal}
         onRequestClose={closeModal}
