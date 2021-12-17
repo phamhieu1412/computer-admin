@@ -31,10 +31,10 @@ const Login = () => {
 
     dispatch(
       AuthActions.login(
-        { email: info.email, password: info.password },
+        { username: info.email, password: info.password },
         {
           onSuccess: () => {
-            history.push("/dashboard");
+            history.push("/general");
           },
           onFailure: (textError) => {
             notificationToast(textError);
@@ -58,9 +58,9 @@ const Login = () => {
         <div className="form-inner">
           <h2>Đăng nhập</h2>
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="email">Tên đăng nhập:</label>
             <input
-              type="email"
+              type="text"
               className="email"
               id="email"
               value={info.email}

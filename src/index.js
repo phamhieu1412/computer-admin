@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import thunk from "redux-thunk";
 import { Provider } from "react-redux";
+import { ToastProvider } from "react-toast-notifications";
 import reportWebVitals from "./reportWebVitals";
 
 import { createStore, applyMiddleware } from "redux";
@@ -18,13 +19,13 @@ import * as serviceWorker from "./serviceWorker";
 
 const store = createStore(rootReducer, applyMiddleware(thunk));
 
-document.title = "Tua CRM";
-
 ReactDOM.render(
   <Provider store={store}>
-    <React.StrictMode>
-      <Layout />
-    </React.StrictMode>
+    <ToastProvider>
+      <React.StrictMode>
+        <Layout />
+      </React.StrictMode>
+    </ToastProvider>
   </Provider>,
   document.getElementById("root")
 );

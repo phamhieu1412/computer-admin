@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 
 import "./topnav.css";
+import "antd/dist/antd.css";
 import Dropdown from "../dropdown/Dropdown";
 import ThemeMenu from "../thememenu/ThemeMenu";
 
@@ -81,17 +82,22 @@ const TopNav = (props) => {
   return (
     <div className="topnav">
       <div className="topnav__search">
-        <input type="text" placeholder="Search here..." />
-        <i className="bx bx-search"></i>
+        {/* <input type="text" placeholder="Search here..." />
+        <i className="bx bx-search"></i> */}
       </div>
       <div className="topnav__right">
         <div className="topnav__right-item">
           {/* dropdown here */}
-          <Dropdown
+          {/* <Dropdown
             customToggle={() => renderUserToggle(curr_user)}
             contentData={user_menu}
             renderItems={(item, index) => renderUserMenu(item, index)}
-          />
+          /> */}
+          <div>
+            <button onClick={onLogout} className="dropdown__toggle">
+              <i className="bx bx-power-off" />
+            </button>
+          </div>
         </div>
         <div className="topnav__right-item">
           <Dropdown

@@ -26,6 +26,17 @@ const Layout = () => {
 
     dispatch(ThemeAction.setMode(themeClass));
     dispatch(ThemeAction.setColor(colorClass));
+    // dispatch(
+    //   AuthActions.login(
+    //     { username: 'admin', password: 'admin123' },
+    //     {
+    //       onSuccess: () => {
+    //       },
+    //       onFailure: (textError) => {
+    //       },
+    //     }
+    //   )
+    // );
   }, [dispatch]);
 
   return (

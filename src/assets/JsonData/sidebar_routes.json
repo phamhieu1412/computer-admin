@@ -1,52 +1,47 @@
 [
   {
-    "display_name": "Dashboard",
-    "route": "/dashboard",
+    "display_name": "Tổng quan",
+    "route": "/general",
     "icon": "bx bx-category-alt"
   },
   {
-    "display_name": "Banner",
-    "route": "/banners",
-    "icon": "bx bxs-book-open"
-  },
-  {
-    "display_name": "Nhà cung cấp",
-    "route": "/supplier",
-    "icon": "bx bx-run"
-  },
-  {
-    "display_name": "Nhà sản suất",
-    "route": "/manufacturers",
-    "icon": "bx bx-buildings"
-  },
-  {
-    "display_name": "Danh mục sản phẩm",
-    "route": "/menu",
-    "icon": "bx bx-menu-alt-right"
-  },
-  {
-    "display_name": "Phiếu nhập hàng",
-    "route": "/import",
-    "icon": "bx bx-comment-detail"
-  },
-  {
-    "display_name": "Sản phẩm",
-    "route": "/products",
-    "icon": "bx bx-package"
-  },
-  {
-    "display_name": "Quản lý khách hàng",
-    "route": "/customers",
+    "display_name": "Tài khoản",
+    "route": "/users",
     "icon": "bx bx-user"
   },
   {
-    "display_name": "Quản lý nhân viên",
-    "route": "/staffs",
-    "icon": "bx bx-user-pin"
+    "display_name": "Thành phố",
+    "route": "/cities",
+    "icon": "bx bx-buildings"
   },
   {
-    "display_name": "Quản lý đơn hàng",
-    "route": "/orders",
-    "icon": "bx bx-box"
+    "display_name": "Loại chỗ nghỉ",
+    "route": "/propertyTypes",
+    "icon": "bx bx-list-ol"
+  },
+  {
+    "display_name": "Chỗ nghỉ",
+    "route": "/properties",
+    "icon": "bx bx-chair"
+  },
+  {
+    "display_name": "Phòng",
+    "route": "/rooms",
+    "icon": "bx bx-hotel"
+  },
+  {
+    "display_name": "Thống kê",
+    "route": "/statistic",
+    "icon": "bx bx-bar-chart"
+  },
+  {
+    "display_name": "Dự đoán",
+    "route": "/prediction",
+    "icon": "bx bx-bar-chart-square"
+  },
+  {
+    "display_name": "Bất thường",
+    "route": "/irregular",
+    "icon": "bx bx-line-chart"
   }
 ]

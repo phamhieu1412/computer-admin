@@ -2,31 +2,30 @@ import React from "react";
 
 import { Route, Switch } from "react-router-dom";
 
-import Dashboard from "../pages/Dashboard";
-import Banners from "../pages/Banners";
-import Customers from "../pages/Customers";
-import Suppliers from "../pages/Suppliers";
-import Manufacturers from "../pages/Manufacturers";
-import Categories from "../pages/Categories";
-import Receipts from "../pages/Receipts";
-import Users from "../pages/Users";
-import Products from "../pages/Products";
-import Orders from "../pages/Orders";
+import General from "../screens/Manager/General";
+import Statistic from "../screens/Manager/Statistic";
+import Prediction from "../screens/Manager/Prediction";
+import Irregular from "../screens/Manager/Irregular";
+
+import Users from "../screens/Manager/Users";
+import Cities from "../screens/Manager/Cities";
+import PropertyTypes from "../screens/Manager/PropertyTypes";
+import Properties from "../screens/Manager/Properties";
+import Rooms from "../screens/Manager/Rooms";
 
 const Routes = () => {
   return (
     <Switch>
-      <Route path="/" exact component={Dashboard} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/banners" component={Banners} />
-      <Route path="/supplier" component={Suppliers} />
-      <Route path="/manufacturers" component={Manufacturers} />
-      <Route path="/menu" component={Categories} />
-      <Route path="/import" component={Receipts} />
-      <Route path="/products" component={Products} />
-      <Route path="/staffs" component={Users} />
-      <Route path="/customers" component={Customers} />
-      <Route path="/orders" component={Orders} />
+      <Route path="/" exact component={General} />
+      <Route path="/general" component={General} />
+      <Route path="/users" component={Users} />
+      <Route path="/cities" component={Cities} />
+      <Route path="/propertyTypes" component={PropertyTypes} />
+      <Route path="/properties" component={Properties} />
+      <Route path="/rooms" component={Rooms} />
+      <Route path="/statistic" component={Statistic} />
+      <Route path="/prediction" component={Prediction} />
+      <Route path="/irregular" component={Irregular} />
     </Switch>
   );
 };

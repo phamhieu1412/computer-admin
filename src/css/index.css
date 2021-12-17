@@ -75,7 +75,7 @@ ul {
 }
 
 input {
-    border: 2px solid transparent;
+    border: 1px solid;
     outline: 0;
 }
 

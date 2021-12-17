@@ -1,6 +1,6 @@
 .dropdown {
     position: relative;
-    z-index: 99;
+    z-index: 99999999;
 }
 
 .dropdown__toggle {
@@ -43,6 +43,7 @@
     transform-origin: top right;
     transform: scale(0);
     transition: transform 0.3s ease 0s;
+    z-index: 99999999;
 }
 
 .dropdown__content.active {

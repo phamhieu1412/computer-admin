@@ -1,4 +1,4 @@
-export const url = "http://a03a-210-245-54-40.ngrok.io";
+export const url = "http://30c8-210-245-54-40.ngrok.io/api/";
 
 export const HEADERS = {
   default_header: () => ({
@@ -26,7 +26,7 @@ export const HEADERS = {
 export const API_URLS = {
   USER: {
     login: (payload) => ({
-      endPoint: `${url}/api/v1/auth/login`,
+      endPoint: `${url}auth/login`,
       method: "POST",
       headers: HEADERS.default_header(),
       payload,
